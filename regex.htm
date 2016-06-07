@@ -1,0 +1,220 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Regular Expressions</title>
+<style type="text/css" <!--
+.normal {  font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 10px; font-weight: normal; color: #000000}
+.medium {  font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 12px; font-weight: bold; color: #000000; text-decoration: none}
+--></style>
+</head>
+<body>
+Useful Notepad++ (POSIX) reg exes<br>
+^ matches BOL, $ matches EOL, \b matches word boundary, \t matches whitespace, \n and/or \r matches newlines.<br>
+Parentheses are not required for a simple search but are used here to aid forming patterns with replaceable subexpressions. <br>
+Most regexes here have been tested with Notepad++, MySQL & other apps that use POSIX flavor REs. Sadly, Unicode is unsupported. :-(<br>
+The grammar REs work in many cases but are not very sophisticated and not intended to replace grammar or spell checkers.<br>
+Test data is included in comments. Open this file in Notepad++, test & add your own expressions!<br>
+<!-- RegEx test data
+plurals, possessive nouns & contractions:
+dogs
+cats
+rats
+musses
+fusses
+buses
+
+ass'
+bass'
+cat's 
+dog's
+pig's
+rat's
+
+can't
+won't
+didn't
+shouldn't
+
+Relational ops:
+1 < 4
+2 == 2
+5 > 3
+
+Assignment:
+a := 2
+b = 3.1415
+i += 3;
+i-=5;
+
+Statements:
+int x = class.function(arg1, arg2, arg3);
+
+Numbers: 
+-4, -3, -2, -1, 0, 1, 2, 3, 4, 5
+-40, -30, -20, -10, 0, 10, +20, +30, +40, +50
+-4.0, -3.0, -2.0, -1.0, 0.0, +1.0, +2.0, +3.0, 4.0, 5.0
+-4.01234, -3.56789, -2.01234, -1.56789, 0.0, +1.01234, 2.56789, 3.01234, 4.56789, 5.0123456789
+
+IPv4 Addresses, URLs, paths:
+127.0.0.1
+255.124.13.2
+355.424.13.2 // current IPv4 re doesn't care about bad addresses 
+http://127.0.0.1:8000/index.php
+marcuspbell@gmail.com
+C:\Users\Marcus\AppData\Roaming\inkscape\templates // absolute path
+..\AppData\Roaming\inkscape\templates // relative path
+1101-1203
+1201-1231
+-->
+
+<h3>Simple expressions</h3>
+<table border=1>
+<tr>
+<td bgcolor=silver class='medium'>RxName</td><td bgcolor=silver class='medium'>exp</td></tr>
+<tr>
+<td class='normal' valign='top'>Relational Operator</td>
+<td class='normal' valign='top'>([>=<]{1,}[=]?)</td>
+</tr>
+<tr>
+<td class='normal' valign='top'>Assignment</td>
+<td class='normal' valign='top'>([:]?[=]+)</td>
+</tr>
+<tr>
+<td class='normal' valign='top'>Reflexive Assignment</td>
+<td class='normal' valign='top'>([+-]{1,1}[=]{1,1})</td>
+</tr>
+<tr>
+<td class='normal' valign='top'>Unary Increment</td>
+<td class='normal' valign='top'>(+{2,2})</td>
+</tr>
+<tr>
+<td class='normal' valign='top'>Unary Decrement</td>
+<td class='normal' valign='top'>(-{2,2})</td>
+</tr>
+<tr>
+<td class='normal' valign='top'>BeginTag</td>
+<td class='normal' valign='top'>(<{1,1})([a-z]{1,})(>?)</td>
+</tr>
+<tr>
+<td class='normal' valign='top'>EndTag</td>
+<!-- remove \ before ? using (doesn't parse right) -->
+<td class='normal' valign='top'>(<\?)(/{1,1})([a-z]{1,})(>?)</td> 
+</tr>
+<tr>
+<td class='normal' valign='top'>ellipsis</td> <!--   -->
+<td class='normal' valign='top'>(\.{3,3})</td>
+</tr>
+<tr>
+<td class='normal' valign='top'>QPunct</td> <!-- qualifier punctuation  -->
+<td class='normal' valign='top'>([,;]+)</td>
+</tr>
+<tr>
+<td class='normal' valign='top'>TPunct</td> <!-- terminal punctuation  -->
+<td class='normal' valign='top'>(\.!?)</td>
+</tr>
+</table>
+<br>
+<h3>Complex expressions</h3>
+<table border=1>
+<tr>
+<td class='normal' valign='top'>Integer</td>
+<td class='normal' valign='top'>([\-+]?[0-9]+)</td>
+</tr>
+<tr>
+<td class='normal' valign='top'>Real</td>
+<td class='normal' valign='top'>([\-+]?[0-9]+[.]{1,1}[0-9]{1,})</td>
+</tr>
+<tr>
+<td class='normal' valign='top'>String literal</td>
+<td class='normal' valign='top'>(["']{1,1}[^'"]*["']{1,1})</td>
+</tr>
+<tr>
+<td class='normal' valign='top'>Identifier</td>
+<td class='normal' valign='top'>([a-z_]+[0-9a-z_]?)</td>
+</tr>
+<tr>
+<td class='normal' valign='top'>XML</td>
+<td class='normal' valign='top'>([<]{1,1})(.*)([>]{1,1})</td>
+</tr>
+<tr>
+<td class='normal' valign='top'>email</td>
+<td class='normal' valign='top'>(\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\b)</td>
+</tr>
+<tr>
+<td class='normal' valign='top'>protocol</td>
+<td class='normal' valign='top'>(\b(http|https|ftp)\b:{1,1})</td>
+</tr>
+<tr>
+<td class='normal' valign='top'>object.attribute</td> <!-- identifier.identifier  -->
+<td class='normal' valign='top'>(\b[a-z_]+[0-9a-z_]?)\.{1,1}([a-z_]+[0-9a-z_]?\b)</td>
+</tr>
+<tr>
+<td class='normal' valign='top'>argument list</td>
+<td class='normal' valign='top'>[(]{1,1}([^()]*)[)]{1,1}</td>
+</tr>
+<tr>
+<td class='normal' valign='top'>DLPath (Windows)</td>
+<td class='normal' valign='top'>([a-z]{1,1}(:\\){1,1}([a-z_]+[0-9a-z_\\]{1,}))</td>
+</tr>
+<tr>
+<td class='normal' valign='top'>RelPath (Windows)</td>
+<td class='normal' valign='top'>([..]{2,2}(\\){1,1}([a-z_]+[0-9a-z_\\]{1,}))</td>
+</tr>
+<tr>
+<td class='normal' valign='top'>IPv4</td> <!-- does not validate octets  -->
+<td class='normal' valign='top'>([0-9]{1,3})[.]{1,1}([0-9]{1,3})[.]{1,1}([0-9]{1,3})[.]{1,1}([0-9]{1,3})</td>
+</tr>
+<tr>
+<td class='normal' valign='top'>MSTTS</td> <!-- MS text timestamp that appears where least wanted  -->
+<td class='normal' valign='top'>("{1,1})([A-Z]{3,3})([ ,]{2,2})(([A-Z0-9 ]{12,12})([0-9:]+[0-9:]+)")</td>
+</tr>
+<tr>
+<td class='normal' valign='top'>MSTTS2</td> <!-- field by field variant -->
+<td class='normal' valign='top'>("{1,1})([A-Z]{3,3})([ ,]{2,2})(([0-9]{1,2})([ A-Z]{4,5})([ 0-9]{4,5})([0-9:]+[0-9:]+)")</td>
+</tr>
+</table>
+<br>
+<h3>Grammatical helpers (very rough)</h3>
+<table border=1>
+<tr>
+<td class='normal' valign='top'>word</td>
+<td class='normal' valign='top'>([a-z\t]{1,})</td>
+</tr>
+<tr>
+<td class='normal' valign='top'>vowels</td>
+<td class='normal' valign='top'>[aeiouy]</td>
+</tr>
+<tr>
+<td class='normal' valign='top'>consonants</td>
+<td class='normal' valign='top'>[bcdfghjklmnpqrstvwxz]</td>
+</tr>
+<tr>
+<td bgcolor=silver class='medium'>Part of speech</td><td bgcolor=silver class='medium'> </td></tr>
+<tr>
+<td class='normal' valign='top'>adverb</td>
+<td class='normal' valign='top'>([a-z\t]{1,})ly</td>
+</tr>
+<tr>
+<td class='normal' valign='top'>present participle</td>
+<td class='normal' valign='top'>([a-z\t]{1,})ing</td>
+</tr>
+<tr>
+<td class='normal' valign='top'>past tense</td>
+<td class='normal' valign='top'>([a-z\t]{1,})ed</td>
+</tr>
+<tr>
+<td class='normal' valign='top'>contraction</td> <!--   -->
+<td class='normal' valign='top'>([a-z\t]{1,})'[a-rt-z]{1,2}</td>
+</tr>
+<tr>
+<td class='normal' valign='top'>possessive</td> <!--   -->
+<td class='normal' valign='top'>([a-z\t]{1,})(ss'|'s)</td>
+</tr>
+<tr>
+<td class='normal' valign='top'>plurals</td> <!--   -->
+<td class='normal' valign='top'>\b([a-rt-z\t]{1,})(ies|es|s)\b</td>
+</tr>
+<tr>
+
+</tr>
+</table>
+</body></html>
